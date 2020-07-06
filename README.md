@@ -7,10 +7,10 @@
 
 2. fascode_search_tweets.pyを実行
 
-    15秒間隔でツイートされます。
+    15秒間隔でツイートされます。search関数の第二引数を任意の値に設定し、適当な検索間隔を設定してください。
     ログ出力のためrootで実行してください。
 
-Systemd Unitファイルも添付しております。
+Systemd Unitファイルも添付しております。 /usr/local/share/search_tweets/fascode_search_tweets.pyを実行する前提で記述されております。
 
 <h2>〈FascodeNetworkと開発者について〉</h2>
 <a href="https://fascode.net/">Fascode Network</a>は学生を主体とする創作チームです。<br>
