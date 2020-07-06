@@ -18,6 +18,7 @@ import setting
 import urllib
 import json
 import time
+import datetime
 
 old_tweets = []
 
@@ -54,15 +55,28 @@ def search(searchwords, set_count, bottweets):
 
 def post_tweets(detected_tweets):
     for tweet in detected_tweets:
-        senddate = json.dumps({
+        senddate = json.dumps({ 
                 "icon_url":tweet[3],
                 "username":str(tweet[1]),
                 "text": tweet[4] + '\n' + tweet[2]
-                })
+                }, ensure_ascii=False)
         headers = {
            'Content-Type': 'application/json'
         }
-        urllib.request.Request(url, data=senddate.encode(), method='POST', headers=headers)
+        response = urllib.request.Request(url, data=senddate.encode(), method='POST', headers=headers)
+        try:
+            with urllib.request.urlopen(response) as response:
+                status = str(response.getcode())
+                with open('/var/log/search_tweets.log', mode='a')  as f:
+                    dt_now = datetime.datetime.now()
+                    time = dt_now.strftime('%Y/%m/%d %H:%M:%S.%f')
+                    writeline = ['HTTP return code: ', status, '\n', 'tiemcode: ', time, '\n', senddate.replace(',', '\n').replace('\\n', '\n "link": \"').replace('{', ' ').replace('}', ''), '\n']
+                    f.writelines(writeline)
+                    
+
+        except urllib.error.URLError as e:
+            with open('/var/log/search_tweets.err', mode='a')  as f:
+                print(e.reason)
 
 def control_arraylength():
     if len(old_tweets) > 11:
