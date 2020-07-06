@@ -10,6 +10,8 @@
     15秒間隔でツイートされます。
     ログ出力のためrootで実行してください。
 
+Systemd Unitファイルも添付しております。
+
 <h2>〈FascodeNetworkと開発者について〉</h2>
 <a href="https://fascode.net/">Fascode Network</a>は学生を主体とする創作チームです。<br>
 <a href="https://fascode.net/projects/linux/alter/">AlterLinux</a>と<a href="https://fascode.net/projects/linux/serene/">SereneLinux</a>の開発を行っています。
