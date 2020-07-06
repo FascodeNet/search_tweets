@@ -67,13 +67,13 @@ def post_tweets(detected_tweets):
             with urllib.request.urlopen(response) as response:
                 headers = response.getheaders()
                 status = response.getcode()
-
-                print(headers)
-                print(status)
+                with open('/var/log/search_tweets.log', mode='a')  as f:
+                    print(headers)
+                    print(status)
 
         except urllib.error.URLError as e:
-            print(e.reason)
-
+            with open('/var/log/search_tweets.err', mode='a')  as f:
+                print(e.reason)
 
 def control_arraylength():
     if len(old_tweets) > 11:

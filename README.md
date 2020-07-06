@@ -1,9 +1,14 @@
 # Search Tweets
 ## 使い方
 1. .envファイルを作成
+
     .env.sampleをご参照ください。
+
+
 2. fascode_search_tweets.pyを実行
+
     15秒間隔でツイートされます。
+    ログ出力のためrootで実行してください。
 
 <h2>〈FascodeNetworkと開発者について〉</h2>
 <a href="https://fascode.net/">Fascode Network</a>は学生を主体とする創作チームです。<br>
