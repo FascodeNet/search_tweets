@@ -1,10 +1,10 @@
 [Unit]
 Description=Search tweets about fascode
-After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/share/fascode_search_tweets/fascode_search_tweets.py
+Restart=always
+ExecStart=/usr/local/share/search_tweets/fascode_search_tweets.py
 
 [Install]
-WantdBy=multi-user.target
+WantedBy=multi-user.target
