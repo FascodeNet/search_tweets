@@ -37,7 +37,7 @@ def search(searchwords, set_count, bottweets):
     for result in results:
         status_n = result._json['id']
         if status_n in old_tweets:
-            return 0
+            return detected_tweets
         else:
             old_tweets.append(status_n)
 
@@ -62,18 +62,7 @@ def post_tweets(detected_tweets):
         headers = {
            'Content-Type': 'application/json'
         }
-        response = urllib.request.Request(url, data=senddate.encode(), method='POST', headers=headers)
-        try:
-            with urllib.request.urlopen(response) as response:
-                headers = response.getheaders()
-                status = response.getcode()
-                with open('/var/log/search_tweets.log', mode='a')  as f:
-                    print(headers)
-                    print(status)
-
-        except urllib.error.URLError as e:
-            with open('/var/log/search_tweets.err', mode='a')  as f:
-                print(e.reason)
+        urllib.request.Request(url, data=senddate.encode(), method='POST', headers=headers)
 
 def control_arraylength():
     if len(old_tweets) > 11:
@@ -92,7 +81,7 @@ def main():
             ]
     while True:
         detected_tweets = search("(Serene Linux) OR SereneLinux OR  (Alter Linux) OR AlterLinux OR Fascode OR (Fascode Network) OR FascodeNetwork OR AlterISO OR F@scode OR Fasc0de OR F@sc0de exclude:retweets", 10, bottweets)
-        if detected_tweets == 0:
+        if detected_tweets == []:
             print("Could not be found ")
         else:
             post_tweets(detected_tweets)
