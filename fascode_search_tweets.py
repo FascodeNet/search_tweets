@@ -31,7 +31,7 @@ auth.set_access_token(access_key, access_secret)
 api = tweepy.API(auth)
 
 url = setting.url
-def search(searchwords, set_count, bottweets):
+def search(searchwords, set_count):
     # 現在の時刻
     results = api.search(q=searchwords, count=set_count)
     detected_tweets = []
@@ -43,8 +43,6 @@ def search(searchwords, set_count, bottweets):
             old_tweets.append(status_n)
 
         text = result._json['text']
-        if text in bottweets:
-            continue
         username = result.user._json['screen_name']
         url = "https://twitter.com/" + username + "/status/" + str(status_n)
         icon = result.user._json['profile_image_url_https']
@@ -84,17 +82,8 @@ def control_arraylength():
         return old_tweets
 
 def main():
-    bottweets = [
-            "あなたのPCに隠し味を。Serenelinuxダウンロードはこちらです。https://t.co/PfCCI4U8DG",
-            "[定期]\nArch LinuxとAlter Linuxはよいぞ\nFascode Networkが開発しているAlter Linuxはこちらから\n\nhttps://t.co/n2z37xA5MQ",
-            "Linux開発者の皆さん情報を共有しませんか？\nLinux使用者の皆さん開発者へ質問しませんか？\nNNLinuxやSereneLinux、caramelOS…etc\n各種チャンネルで語り合いましょう\nhttps://t.co/FRZCL7kE9N",
-            "かなりの自信作でSereneLinuxにも採用されることになったので誰でも良いのでStarつけてクレメンス（自信なくてモチベ下がってる）\nhttps://t.co/qSyfHNyX7X",
-            "sereneは神os\nここからダウンロード\nhttps://t.co/6Hz9349PuJ",
-            "数あるLinuxディストリビューションの中でも軽量、そして使いやすいAlter LinuxとSerene Linuxをこの機会にぜひ使ってみませんか？ \n ダウンロードはここから！ \n https://t.co/ojYqqauBR6",
-            "【定期】\nSereneLinuxというUbuntuベースのOSを開発中\nhttps://t.co/MF0vwo7WAO"
-            ]
     while True:
-        detected_tweets = search("(Serene Linux) OR SereneLinux OR  (Alter Linux) OR AlterLinux OR Fascode OR (Fascode Network) OR FascodeNetwork OR AlterISO OR F@scode OR Fasc0de OR F@sc0de exclude:retweets", 10, bottweets)
+        detected_tweets = search("(Serene Linux) OR SereneLinux OR  (Alter Linux) OR AlterLinux OR Fascode OR (Fascode Network) OR FascodeNetwork OR AlterISO OR F@scode OR Fasc0de OR F@sc0de exclude:retweets -source:twittbot.net", 10)
         if detected_tweets == []:
             print("Could not be found ")
         else:
