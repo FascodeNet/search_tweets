@@ -17,7 +17,7 @@ import time
 import setting
 import urllib
 import datetime
-import exit_proces
+import initial_and_end_process
 
 old_tweets = []
 
@@ -106,7 +106,15 @@ def control_arraylength():
         del old_tweets[10]
         return old_tweets
 
-def main():
+end_process = lambda: exit(0)
+
+def main(saved_tweets=[]):
+    if saved_tweets == []:
+        pass
+    else:
+        global old_tweets
+        old_tweets = saved_tweets
+
     consumer_key = setting.consumer_key
     consumer_secret = setting.consumer_secret
     access_key = setting.access_key
@@ -127,4 +135,5 @@ def main():
         time.sleep(10)
 
 if __name__ == '__main__':
+    print('Warning! No read saved_tweets.')
     main()

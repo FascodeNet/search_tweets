@@ -12,6 +12,9 @@
 
 Systemd Unitファイルも添付しております。 /usr/local/share/search_tweets/fascode_search_tweets.pyを実行する前提で記述されております。
 
+## 依存関係
+tweepy, python-dotenvが必要です。pipで導入してください。
+※補足 url_secretは他チャンネルに送信するための機能です。不要な方は適度コメントアウトをお願いします。
 <h2>〈FascodeNetworkと開発者について〉</h2>
 <a href="https://fascode.net/">Fascode Network</a>は学生を主体とする創作チームです。<br>
 <a href="https://fascode.net/projects/linux/alter/">AlterLinux</a>と<a href="https://fascode.net/projects/linux/serene/">SereneLinux</a>の開発を行っています。
