@@ -15,7 +15,7 @@ import sys
 import fascode_search_tweets
 
 def initial_process():
-    if not os.path.exists('var/log/search_tweets.lasttweets'):
+    if not os.path.exists('/var/log/search_tweets.lasttweets'):
         return []
 
     with open('/var/log/search_tweets.lasttweets', mode='r') as f:
