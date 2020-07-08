@@ -17,7 +17,7 @@ import time
 import setting
 import urllib
 import datetime
-import initial_and_end_process
+import os
 
 old_tweets = []
 
@@ -104,16 +104,17 @@ def post_tweet_to_webhook(url, senddate):
 def control_arraylength():
     if len(old_tweets) > 11:
         del old_tweets[10]
+        with open('/var/log/search_tweets.lasttweets', mode='w') as f:
+            f.write(",".join(map(str, old_tweets)))
         return old_tweets
 
 end_process = lambda: exit(0)
 
-def main(saved_tweets=[]):
-    if saved_tweets == []:
-        pass
-    else:
-        global old_tweets
-        old_tweets = saved_tweets
+def main():
+    if not os.path.exists('/var/log/search_tweets.lasttweets'):
+        return []
+    with open('/var/log/search_tweets.lasttweets', mode='r') as f:
+        return [int(x.strip()) for x in f.read().split(',')]
 
     consumer_key = setting.consumer_key
     consumer_secret = setting.consumer_secret
@@ -135,5 +136,4 @@ def main(saved_tweets=[]):
         time.sleep(10)
 
 if __name__ == '__main__':
-    print('Warning! No read saved_tweets.')
     main()

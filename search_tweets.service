@@ -4,8 +4,7 @@ Description=Search tweets about fascode
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/local/share/search_tweets/initial_and_end_process.py -i
-ExecStop=/usr/local/share/search_tweets/initial_and_end_process.py -e
+ExecStart=/usr/local/share/search_tweets/fascode_search_tweets.py
 
 [Install]
 WantedBy=multi-user.target
