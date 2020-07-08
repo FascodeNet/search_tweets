@@ -19,11 +19,11 @@ def initial_process():
         return []
 
     with open('/var/log/search_tweets.lasttweets', mode='r') as f:
-        return int(f.readlines())
+        return [int(x.strip()) for x in f.read().split(',')]
 
 def end_process(old_tweets):
     with open('/var/log/search_tweets.lasttweets', mode='w') as f:
-        f.writelines(str(old_tweets))
+        f.write(",".join(map(str, old_tweets)))
 
 def _help():
     body = """
