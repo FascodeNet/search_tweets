@@ -47,7 +47,7 @@ def post_tweets(url, url_secret, detected_tweets):
                 "username":str(tweet[1]),
                 "text": tweet[4] + '\n' + tweet[2]
                 }, ensure_ascii=False)
-        post_tweets_secret(url_secret, tweet)
+        #post_tweets_secret(url_secret, tweet)
         post_tweet_to_webhook(url, senddate)
 
 def post_tweets_secret(url_secret, tweet):
