@@ -101,12 +101,18 @@ def post_tweet_to_webhook(url, senddate):
         with open('/var/log/search_tweets.err', mode='a')  as f:
             print(e.reason)
 
+def write_lasttweets():
+    with open('/var/log/search_tweets.lasttweets', mode='w') as f:
+        f.write(",".join(map(str, old_tweets)))
+
 def control_arraylength():
     if len(old_tweets) > 11:
         del old_tweets[10]
-        with open('/var/log/search_tweets.lasttweets', mode='w') as f:
-            f.write(",".join(map(str, old_tweets)))
+        write_lasttweets()
         return old_tweets
+    else:
+        write_lasttweets()
+        
 
 end_process = lambda: exit(0)
 
