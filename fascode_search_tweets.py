@@ -111,10 +111,10 @@ def control_arraylength():
 end_process = lambda: exit(0)
 
 def main():
-    if not os.path.exists('/var/log/search_tweets.lasttweets'):
-        return []
-    with open('/var/log/search_tweets.lasttweets', mode='r') as f:
-        return [int(x.strip()) for x in f.read().split(',')]
+    if os.path.exists('/var/log/search_tweets.lasttweets'):
+        with open('/var/log/search_tweets.lasttweets', mode='r') as f:
+            global old_tweets
+            old_tweets = [int(x.strip()) for x in f.read().split(',')]
 
     consumer_key = setting.consumer_key
     consumer_secret = setting.consumer_secret
