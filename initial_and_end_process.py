@@ -40,9 +40,9 @@ def main():
     if len(sys.argv) == 1:
         fascode_search_tweets.main(initial_process())
     if len(sys.argv) == 2:
-        if sys.argv[2] == '-i':
+        if sys.argv[1] == '-i':
             fascode_search_tweets.main(initial_process())
-        elif sys.argv[2] == '-e':
+        elif sys.argv[1] == '-e':
             end_process(fascode_search_tweets.old_tweets)
             fascode_search_tweets.end_process()
             exit(0)
