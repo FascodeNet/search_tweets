@@ -22,7 +22,7 @@ import os
 old_tweets = []
 
 def search(searchwords, set_count, api):
-    results = api.search(q=searchwords, count=set_count)
+    results = api.search(q=searchwords, count=set_count, tweet_mode="extended")
     detected_tweets = []
     for result in results:
         status_n = result._json['id']
@@ -42,7 +42,7 @@ def search(searchwords, set_count, api):
 
 def post_tweets(url, url_secret, detected_tweets):
     for tweet in detected_tweets:
-        senddate = json.dumps({ 
+        senddate = json.dumps({
                 "icon_url":tweet[3],
                 "username":str(tweet[1]),
                 "text": tweet[4] + '\n' + tweet[2]
@@ -51,7 +51,7 @@ def post_tweets(url, url_secret, detected_tweets):
         post_tweet_to_webhook(url, senddate)
 
 def post_tweets_secret(url_secret, tweet):
-    senddate = json.dumps({ 
+    senddate = json.dumps({
                 "icon_url":tweet[3],
                 "username":str(tweet[1]),
                 "attachments": [
@@ -81,7 +81,7 @@ def post_tweets_secret(url_secret, tweet):
                 ]
             }, ensure_ascii=False)
     post_tweet_to_webhook(url_secret, senddate)
-    
+
 def post_tweet_to_webhook(url, senddate):
     headers = {
            'Content-Type': 'application/json'
@@ -95,7 +95,6 @@ def post_tweet_to_webhook(url, senddate):
                 time = dt_now.strftime('%Y/%m/%d %H:%M:%S.%f')
                 writeline = ['HTTP return code: ', status, '\n', 'tiemcode: ', time, '\n', senddate.replace(',', '\n').replace('\\n', '\n "link": \"').replace('{', ' ').replace('}', ''), '\n']
                 f.writelines(writeline)
-                    
 
     except urllib.error.URLError as e:
         with open('/var/log/search_tweets.err', mode='a')  as f:
@@ -112,7 +111,7 @@ def control_arraylength():
         return old_tweets
     else:
         write_lasttweets()
-        
+
 
 end_process = lambda: exit(0)
 
