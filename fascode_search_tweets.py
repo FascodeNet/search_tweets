@@ -31,7 +31,7 @@ def search(searchwords, set_count, api):
         else:
             old_tweets.append(status_n)
 
-        text = result._json['text']
+        text = result._json['full_text']
         username = result.user._json['screen_name']
         url = "https://twitter.com/" + username + "/status/" + str(status_n)
         icon = result.user._json['profile_image_url_https']
