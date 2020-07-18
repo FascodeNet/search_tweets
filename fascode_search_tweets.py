@@ -132,7 +132,7 @@ def main():
     url = setting.url
     url_secret = setting.url_secret
     while True:
-        detected_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO" OR "F@scode" OR "Fasc0de" OR "F@sc0de") -(from:Fascode_SPT ("さんのおみくじの結果は..." OR 天気予報はこちらです！)) -(to:Fascode_SPT ("おみくじ" OR "天気予報")) exclude:retweets -source:twittbot.net', 10, api)
+        detected_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 10, api)
         if detected_tweets == []:
             print("Could not be found ")
         else:
