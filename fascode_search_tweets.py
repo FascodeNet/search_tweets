@@ -62,7 +62,7 @@ def post_tweets_secret(url_secret, tweet):
     senddate = json.dumps({
                 "icon_url":tweet[3],
                 "username":str(tweet[1]),
-                "message": tweet[4] + '\n' + tweet[2],
+                "update": {"message": tweet[4] + '\n' + tweet[2] },
                 "attachments": [
                 {
                     "pretext": tweet[2],
