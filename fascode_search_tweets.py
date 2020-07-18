@@ -70,17 +70,10 @@ def post_tweets_secret(url_secret, tweet):
                     {
                         "name": "Favorite this tweet",
                         "integration": {
-                            "url": "https://fascode.net/api/twitter/iine.php?id=" + tweet[2],
+                            "url": "https://fascode.net/api/twitter/iine.php?id=" + tweet[0],
 
                         }
-                    }, {
-                        "name": "Update",
-                        "integration": {
-                            "url": "http://127.0.0.1:7357",
-                                "context": {
-                                "action": "do_something_update"
-                                }
-                        }
+                        "ephemeral_text": "Favorited this tweet!"
                     }
                     ]
                 }
