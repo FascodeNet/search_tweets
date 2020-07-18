@@ -72,7 +72,9 @@ def post_tweets_secret(url_secret, tweet):
                         "integration": {
                             "url": "https://fascode.net/api/twitter/iine.php?id=" + str(tweet[0])
                         },
-                        "ephemeral_text": "Favorited this tweet!"
+                        "update": {
+                            "message": tweet[4] + '\n' + tweet[2]
+                        },
                     }
                     ]
                 }
