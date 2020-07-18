@@ -62,6 +62,7 @@ def post_tweets_secret(url_secret, tweet):
     senddate = json.dumps({
                 "icon_url":tweet[3],
                 "username":str(tweet[1]),
+                "message": tweet[4] + '\n' + tweet[2],
                 "attachments": [
                 {
                     "pretext": tweet[2],
@@ -72,7 +73,6 @@ def post_tweets_secret(url_secret, tweet):
                         "integration": {
                             "url": "https://fascode.net/api/twitter/iine.php?id=" + str(tweet[0])
                         },
-                        "message": tweet[4] + '\n' + tweet[2]
                         },
                     ]
                 }
