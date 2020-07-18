@@ -70,7 +70,7 @@ def post_tweets_secret(url_secret, tweet):
                     {
                         "name": "Favorite this tweet",
                         "integration": {
-                            "url": "https://fascode.net/api/mattermost/replytw.php?twurl=" + tweet[2],
+                            "url": "https://fascode.net/api/twitter/iine.php?id=" + tweet[2],
 
                         }
                     }, {
