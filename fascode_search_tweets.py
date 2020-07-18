@@ -40,6 +40,14 @@ def search(searchwords, set_count, api):
         print("USER: " + username + "\nTEXT: " + text + "\n\nLink: " + url + "\nICON: " + icon)
     return detected_tweets
 
+"""
+tweet[0] == ツイートID
+tweet[1] == ユーザ名
+tweet[2] == ツイートのURL
+tweet[3] == ユーザのアイコン
+tweet[4] == ツイート本文
+"""
+
 def post_tweets(url, url_secret, detected_tweets):
     for tweet in detected_tweets:
         senddate = json.dumps({
@@ -47,7 +55,7 @@ def post_tweets(url, url_secret, detected_tweets):
                 "username":str(tweet[1]),
                 "text": tweet[4] + '\n' + tweet[2]
                 }, ensure_ascii=False)
-        #post_tweets_secret(url_secret, tweet)
+        post_tweets_secret(url_secret, tweet)
         post_tweet_to_webhook(url, senddate)
 
 def post_tweets_secret(url_secret, tweet):
@@ -60,12 +68,10 @@ def post_tweets_secret(url_secret, tweet):
                     "text": tweet[4],
                     "actions": [
                     {
-                        "name": "Favorite the tweet",
+                        "name": "Favorite this tweet",
                         "integration": {
-                            "url": "http://127.0.0.1:7357",
-                            "context": {
-                              "action": "do_something_ephemeral"
-                            }
+                            "url": "https://fascode.net/api/mattermost/replytw.php?twurl=" + tweet[2],
+
                         }
                     }, {
                         "name": "Update",
