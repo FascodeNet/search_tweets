@@ -66,7 +66,6 @@ def post_tweets_secret(url_secret, tweet):
                 {
                     "pretext": tweet[2],
                     "text": tweet[4],
-                    "skip_slack_parsing": True,
                     "update": {"message": tweet[4] + '\n' + tweet[2] },
                     "actions": [
                     {
@@ -77,7 +76,15 @@ def post_tweets_secret(url_secret, tweet):
                                 "action": "do_somethings"
                             },
                         },
-                        },
+                    }, {
+                        "name": "Reply this tweet",
+                        "integration": {
+                            "url": "https://fascode.net/api/mattermost/replytw.php?twurl=" + tweet[2],
+                            "context": {
+                                "action": "do_somethings"
+                            }
+                        }
+                    }
                         
                     ]
                 }
