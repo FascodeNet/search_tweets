@@ -69,25 +69,32 @@ def post_tweets_secret(url_secret, tweet):
                     "update": {"message": tweet[4] + '\n' + tweet[2] },
                     "actions": [
                     {
-                        "name": "Favorite this tweet",
-                        "integration": {
-                            "url": "https://fascode.net/api/twitter/iine.php?id=" + str(tweet[0]),
-                            "context": {
-                                "action": "do_somethings"
-                            },
-                        },
-                    }, {
-                        "name": "Reply this tweet",
+                        "name": "返信🗩",
                         "integration": {
                             "url": "https://fascode.net/api/mattermost/replytw.php?twurl=" + tweet[2],
                             "context": {
-                                "action": "do_somethings"
-                            }
-                        }
-                    }
-                        
+                                "action": "do_something_ephemeral"
+                            },
+                        },
+                    }, {
+                        "name": "リツイート🗘",
+                        "integration": {
+                            "url": "https://fascode.net/api/mattermost/rttw.php?twurl=" + tweet[2],
+                            "context": {
+                                "action": "do_something_ephemeral"
+                            },
+                        },   
+                    }, {
+                        "name": "いいね♥",
+                        "integration": {
+                            "url": "https://fascode.net/api/twitter/iine.php?id=" + str(tweet[0]),
+                            "context": {
+                                "action": "do_somethings_ephemeral"
+                            },
+                        },
+                    },
                     ]
-                }
+                },
                 ]
             }, ensure_ascii=False)
     post_tweet_to_webhook(url_secret, senddate)
@@ -115,8 +122,8 @@ def write_lasttweets():
         f.write(",".join(map(str, old_tweets)))
 
 def control_arraylength():
-    if len(old_tweets) > 11:
-        del old_tweets[10]
+    if len(old_tweets) > 101:
+        del old_tweets[100]
         write_lasttweets()
         return old_tweets
     else:
