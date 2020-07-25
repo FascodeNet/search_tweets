@@ -69,7 +69,7 @@ def post_tweets_secret(url_secret, tweet):
                     "update": {"message": tweet[4] + '\n' + tweet[2] },
                     "actions": [
                     {
-                        "name": "返信🗩",
+                        "name": "🗩返信",
                         "integration": {
                             "url": "https://fascode.net/api/mattermost/replytw.php?twurl=" + tweet[2],
                             "context": {
@@ -77,7 +77,7 @@ def post_tweets_secret(url_secret, tweet):
                             },
                         },
                     }, {
-                        "name": "リツイート🗘",
+                        "name": "🗘リツイート",
                         "integration": {
                             "url": "https://fascode.net/api/mattermost/rttw.php?twurl=" + tweet[2],
                             "context": {
@@ -85,7 +85,7 @@ def post_tweets_secret(url_secret, tweet):
                             },
                         },   
                     }, {
-                        "name": "いいね♥",
+                        "name": "♥いいね",
                         "integration": {
                             "url": "https://fascode.net/api/twitter/iine.php?id=" + str(tweet[0]),
                             "context": {
@@ -145,7 +145,7 @@ def main():
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_key, access_secret)
     api = tweepy.API(auth)
-
+    
     url = setting.url
     url_secret = setting.url_secret
     while True:
