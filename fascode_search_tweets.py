@@ -162,9 +162,8 @@ def main():
         detected_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 100, api)
         if not detected_tweets == []:
             for tweet in detected_tweets:
-                #post_tweets(url, tweet)
-                #post_tweets_secret(url_secret, tweet)
-                pass
+                post_tweets(url, tweet)
+                post_tweets_secret(url_secret, tweet)
         time.sleep(10)
 
 if __name__ == '__main__':
