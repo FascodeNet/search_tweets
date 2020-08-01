@@ -20,25 +20,24 @@ import datetime
 import os
 
 old_tweets = []
-
+#引数: 検索ワード, 検索する件数, apiのインスタンス  機能: 検索結果を2次元リストで返す  リスト形式: [[ツイートID, ユーザ名, ツイートID, アイコン, ツイート本文], [ツイートID, …]]
 def search(searchwords, set_count, api):
     results = api.search(q=searchwords, count=set_count, tweet_mode="extended")
     detected_tweets = []
+    old_tweets.extend([result._json['id'] for result in results])
+    control_arraylength()
     for result in results:
         status_n = result._json['id']
         if status_n in old_tweets:
             return detected_tweets
-        else:
-            old_tweets.append(status_n)
 
         text = result._json['full_text']
         username = result.user._json['screen_name']
         url = "https://twitter.com/" + username + "/status/" + str(status_n)
         icon = result.user._json['profile_image_url_https']
         detected_tweets.append([status_n, username, url, icon, text])
-        print("Found new tweet!")
-        print("USER: " + username + "\nTEXT: " + text + "\n\nLink: " + url + "\nICON: " + icon)
     return detected_tweets
+
 
 """
 tweet[0] == ツイートID
@@ -48,16 +47,16 @@ tweet[3] == ユーザのアイコン
 tweet[4] == ツイート本文
 """
 
-def post_tweets(url, url_secret, detected_tweets):
-    for tweet in detected_tweets:
-        senddate = json.dumps({
-                "icon_url":tweet[3],
-                "username":str(tweet[1]),
-                "text": tweet[4] + '\n' + tweet[2]
-                }, ensure_ascii=False)
-        post_tweets_secret(url_secret, tweet)
-        post_tweet_to_webhook(url, senddate)
+# 検出されたツイートを公開チャンネルのWebhookに投げる形式に整形し, webhookに投げる関数を呼び出す
+def post_tweets(url, tweet):
+    senddate = json.dumps({
+            "icon_url":tweet[3],
+            "username":str(tweet[1]),
+            "text": tweet[4] + '\n' + tweet[2]
+            }, ensure_ascii=False)
+    post_tweet_to_webhook(url, senddate)
 
+# 検出されたツイートを鍵チャンネルのWebhookに投げる形式に整形し, webhookに投げる関数を呼び出す
 def post_tweets_secret(url_secret, tweet):
     senddate = json.dumps({
                 "icon_url":tweet[3],
@@ -99,6 +98,7 @@ def post_tweets_secret(url_secret, tweet):
             }, ensure_ascii=False)
     post_tweet_to_webhook(url_secret, senddate)
 
+# 整形されたデータをWebhookに投げる  同時にログの書き込みも行う
 def post_tweet_to_webhook(url, senddate):
     headers = {
            'Content-Type': 'application/json'
@@ -117,26 +117,32 @@ def post_tweet_to_webhook(url, senddate):
         with open('/var/log/search_tweets.err', mode='a')  as f:
             print(e.reason)
 
+# 最終取得ツイートIDを記録し, 重複取得を回避する
 def write_lasttweets():
     with open('/var/log/search_tweets.lasttweets', mode='w') as f:
         f.write(",".join(map(str, old_tweets)))
 
+# リスト長を調節する
 def control_arraylength():
+    global old_tweets
     if len(old_tweets) > 101:
-        del old_tweets[100]
+        old_tweets = [old_tweets[i] for i in range(100)]
         write_lasttweets()
-        return old_tweets
     else:
         write_lasttweets()
 
-
-end_process = lambda: exit(0)
-
+# 総合処理
 def main():
-    if os.path.exists('/var/log/search_tweets.lasttweets'):
-        with open('/var/log/search_tweets.lasttweets', mode='r') as f:
-            global old_tweets
-            old_tweets = [int(x.strip()) for x in f.read().split(',')]
+    lasttweets_path = r'/var/log/search_tweets.lasttweets'
+    if os.path.exists(lasttweets_path):
+        if os.stat(lasttweets_path).st_size == 0:
+            with open('/var/log/search_tweets.err', mode='a')  as f:
+                f.write('warning: ' + lasttweets_path + "is empty.")
+        else:
+            with open(lasttweets_path, mode='r') as f:
+                global old_tweets
+                old_tweets = [int(x.strip()) for x in f.read().split(',')]
+                control_arraylength()
 
     consumer_key = setting.consumer_key
     consumer_secret = setting.consumer_secret
@@ -148,13 +154,13 @@ def main():
     
     url = setting.url
     url_secret = setting.url_secret
+
     while True:
         detected_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 100, api)
-        if detected_tweets == []:
-            print("Could not be found ")
-        else:
-            post_tweets(url, url_secret, detected_tweets)
-            control_arraylength()
+        if not detected_tweets == []:
+            for tweet in detected_tweets:
+                post_tweets(url, tweet)
+                post_tweets_secret(url_secret, tweet)
         time.sleep(10)
 
 if __name__ == '__main__':
