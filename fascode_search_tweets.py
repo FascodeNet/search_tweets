@@ -24,11 +24,11 @@ old_tweets = []
 def search(searchwords, set_count, api):
     results = api.search(q=searchwords, count=set_count, tweet_mode="extended")
     detected_tweets = []
-    old_tweets.extend([result._json['id'] for result in results])
-    control_arraylength()
     for result in results:
         status_n = result._json['id']
         if status_n in old_tweets:
+            old_tweets.extend([result._json['id'] for result in results])
+            control_arraylength()
             return detected_tweets
 
         text = result._json['full_text']
@@ -36,6 +36,8 @@ def search(searchwords, set_count, api):
         url = "https://twitter.com/" + username + "/status/" + str(status_n)
         icon = result.user._json['profile_image_url_https']
         detected_tweets.append([status_n, username, url, icon, text])
+    old_tweets.extend([result._json['id'] for result in results])
+    control_arraylength()
     return detected_tweets
 
 
@@ -125,8 +127,9 @@ def write_lasttweets():
 # リスト長を調節する
 def control_arraylength():
     global old_tweets
-    if len(old_tweets) > 101:
-        old_tweets = [old_tweets[i] for i in range(100)]
+    if len(old_tweets) >=  200:
+        # 100~199番の要素を0~99番に置き換える(元の0~99番の要素を削除する)
+        old_tweets = [old_tweets[100+i] for i in range(100)]
         write_lasttweets()
     else:
         write_lasttweets()
@@ -137,7 +140,7 @@ def main():
     if os.path.exists(lasttweets_path):
         if os.stat(lasttweets_path).st_size == 0:
             with open('/var/log/search_tweets.err', mode='a')  as f:
-                f.write('warning: ' + lasttweets_path + "is empty.")
+                f.write('warning: ' + lasttweets_path + "is empty.\n")
         else:
             with open(lasttweets_path, mode='r') as f:
                 global old_tweets
@@ -159,8 +162,9 @@ def main():
         detected_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 100, api)
         if not detected_tweets == []:
             for tweet in detected_tweets:
-                post_tweets(url, tweet)
-                post_tweets_secret(url_secret, tweet)
+                #post_tweets(url, tweet)
+                #post_tweets_secret(url_secret, tweet)
+                pass
         time.sleep(10)
 
 if __name__ == '__main__':
