@@ -19,17 +19,21 @@ import urllib
 import datetime
 import os
 
-old_tweets = []
 #引数: 検索ワード, 検索する件数, apiのインスタンス  機能: 検索結果を2次元リストで返す  リスト形式: [[ツイートID, ユーザ名, ツイートID, アイコン, ツイート本文], [ツイートID, …]]
-def search(searchwords, set_count, api):
-    results = api.search(q=searchwords, count=set_count, tweet_mode="extended")
+def search(searchwords, set_count, api, old_tweets):
+    try:
+        results = api.search(q=searchwords, count=set_count, tweet_mode="extended")
+    except tweepy.TweepError as e:
+        with open('/var/log/search_tweets.err', mode='a')  as f:
+            f.write('\n' + e)
+
     detected_tweets = []
     for result in results:
         status_n = result._json['id']
         if status_n in old_tweets:
             old_tweets.extend([result._json['id'] for result in results])
-            control_arraylength()
-            return detected_tweets
+            control_arraylength(old_tweets)
+            return (detected_tweets, old_tweets)
 
         text = result._json['full_text']
         username = result.user._json['screen_name']
@@ -37,8 +41,8 @@ def search(searchwords, set_count, api):
         icon = result.user._json['profile_image_url_https']
         detected_tweets.append([status_n, username, url, icon, text])
     old_tweets.extend([result._json['id'] for result in results])
-    control_arraylength()
-    return detected_tweets
+    control_arraylength(old_tweets)
+    return (detected_tweets, old_tweets)
 
 
 """
@@ -84,7 +88,7 @@ def post_tweets_secret(url_secret, tweet):
                             "context": {
                                 "action": "do_something_ephemeral"
                             },
-                        },   
+                        },
                     }, {
                         "name": "♥いいね",
                         "integration": {
@@ -99,6 +103,9 @@ def post_tweets_secret(url_secret, tweet):
                 ]
             }, ensure_ascii=False)
     post_tweet_to_webhook(url_secret, senddate)
+
+def post_dm_secret(url_secret, dm):
+    pass
 
 # 整形されたデータをWebhookに投げる  同時にログの書き込みも行う
 def post_tweet_to_webhook(url, senddate):
@@ -117,35 +124,45 @@ def post_tweet_to_webhook(url, senddate):
 
     except urllib.error.URLError as e:
         with open('/var/log/search_tweets.err', mode='a')  as f:
-            print(e.reason)
+            f.write('\n' + e.reason)
 
 # 最終取得ツイートIDを記録し, 重複取得を回避する
-def write_lasttweets():
+def write_lasttweets(old_tweets):
     with open('/var/log/search_tweets.lasttweets', mode='w') as f:
         f.write(",".join(map(str, old_tweets)))
 
 # リスト長を調節する
-def control_arraylength():
-    global old_tweets
+def control_arraylength(old_tweets):
     if len(old_tweets) >=  200:
         # 100~199番の要素を0~99番に置き換える(元の0~99番の要素を削除する)
         old_tweets = [old_tweets[100+i] for i in range(100)]
-        write_lasttweets()
+        write_lasttweets(old_tweets)
     else:
-        write_lasttweets()
+        write_lasttweets(old_tweets)
+
+    return old_tweets
+
+# 新規DMを受け取りWebhookに投げる
+def getdmposttowebhook(api, lastid):
+    pass
+
+def readlog(path):
+    if os.path.exists(path):
+        if os.stat(path).st_size == 0:
+            with open('/var/log/search_tweets.err', mode='a')  as f:
+                f.write('warning: ' + path + "is empty.\n")
+        else:
+            with open(path, mode='r') as f:                
+                return [int(x.strip()) for x in f.read().split(',')]
+    else:
+        with open('/var/log/search_tweets.err', mode='a')  as f:
+                f.write('warning: ' + path + "is not found.\n")
+                return [0]
 
 # 総合処理
 def main():
-    lasttweets_path = r'/var/log/search_tweets.lasttweets'
-    if os.path.exists(lasttweets_path):
-        if os.stat(lasttweets_path).st_size == 0:
-            with open('/var/log/search_tweets.err', mode='a')  as f:
-                f.write('warning: ' + lasttweets_path + "is empty.\n")
-        else:
-            with open(lasttweets_path, mode='r') as f:
-                global old_tweets
-                old_tweets = [int(x.strip()) for x in f.read().split(',')]
-                control_arraylength()
+    old_tweets = readlog(r'/var/log/search_tweets.lasttweets')
+    old_tweets = control_arraylength(old_tweets)
 
     consumer_key = setting.consumer_key
     consumer_secret = setting.consumer_secret
@@ -154,17 +171,21 @@ def main():
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_key, access_secret)
     api = tweepy.API(auth)
-    
+
     url = setting.url
     url_secret = setting.url_secret
 
+    count = 0
     while True:
-        detected_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 100, api)
+        
+        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 100, api, old_tweets)
         if not detected_tweets == []:
             for tweet in detected_tweets:
                 post_tweets(url, tweet)
                 post_tweets_secret(url_secret, tweet)
-        time.sleep(10)
+        time.sleep(15)
+        count += 1
+
 
 if __name__ == '__main__':
     main()
