@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Yang Niao
-# Twitter: @YangDevJP
+# Twitter: @yangniao23
 # Email  : yang@fascode.net
 #
 # (c) 2019-2020 Fascode Network.
