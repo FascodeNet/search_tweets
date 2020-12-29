@@ -19,14 +19,21 @@ import urllib
 import datetime
 import os
 
+
 #引数: 検索ワード, 検索する件数, apiのインスタンス  機能: 検索結果を2次元リストで返す  リスト形式: [[ツイートID, ユーザ名, ツイートID, アイコン, ツイート本文], [ツイートID, …]]
 def search(searchwords, set_count, api, old_tweets):
     try:
         results = api.search(q=searchwords, count=set_count, tweet_mode="extended")
     except tweepy.TweepError as e:
         with open('/var/log/search_tweets.err', mode='a')  as f:
-            f.write('\n' + e)
-
+            f.write('\n' + "get error: " + e)
+            f.write('\n' + "reason: " + e.reason + '\n')
+        if e.reason == "[{'message': 'Rate limit exceeded', 'code': 88}]":
+                # 15分待つのに，いつ処理が止まったか時間を表示。
+                print(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
+                time.sleep(60 * 15)
+        return search(searchwords, set_count, api, old_tweets)
+            
     detected_tweets = []
     for result in results:
         status_n = result._json['id']
@@ -40,6 +47,7 @@ def search(searchwords, set_count, api, old_tweets):
         url = "https://twitter.com/" + username + "/status/" + str(status_n)
         icon = result.user._json['profile_image_url_https']
         detected_tweets.append([status_n, username, url, icon, text])
+
     old_tweets.extend([result._json['id'] for result in results])
     control_arraylength(old_tweets)
     return (detected_tweets, old_tweets)
@@ -124,7 +132,7 @@ def post_tweet_to_webhook(url, senddate):
 
     except urllib.error.URLError as e:
         with open('/var/log/search_tweets.err', mode='a')  as f:
-            f.write('\n' + e.reason)
+            f.write('\n' + "post error: " + e.reason)
 
 # 最終取得ツイートIDを記録し, 重複取得を回避する
 def write_lasttweets(old_tweets):
