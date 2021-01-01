@@ -141,9 +141,9 @@ def write_lasttweets(old_tweets):
 
 # リスト長を調節する
 def control_arraylength(old_tweets):
-    if len(old_tweets) >=  200:
-        # 100~199番の要素を0~99番に置き換える(元の0~99番の要素を削除する)
-        old_tweets = [old_tweets[100+i] for i in range(100)]
+    if len(old_tweets) >=  10:
+        # 末尾10項目を列挙しそれで上書きする
+        old_tweets = [old_tweets[len(old_tweets) - 10 + i] for i in range(10)]
         write_lasttweets(old_tweets)
     else:
         write_lasttweets(old_tweets)
@@ -159,6 +159,7 @@ def readlog(path):
         if os.stat(path).st_size == 0:
             with open('/var/log/search_tweets.err', mode='a')  as f:
                 f.write('warning: ' + path + "is empty.\n")
+                return [0]
         else:
             with open(path, mode='r') as f:                
                 return [int(x.strip()) for x in f.read().split(',')]
@@ -186,7 +187,7 @@ def main():
     count = 0
     while True:
         
-        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 100, api, old_tweets)
+        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 10, api, old_tweets)
         if not detected_tweets == []:
             for tweet in detected_tweets:
                 post_tweets(url, tweet)
@@ -194,6 +195,31 @@ def main():
         time.sleep(15)
         count += 1
 
+def test():
+    old_tweets = readlog(r'/var/log/search_tweets.lasttweets')
+    old_tweets = control_arraylength(old_tweets)
 
+    consumer_key = setting.consumer_key
+    consumer_secret = setting.consumer_secret
+    access_key = setting.access_key
+    access_secret = setting.access_secret
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_key, access_secret)
+    api = tweepy.API(auth)
+
+
+    count = 0
+    while True:
+        
+        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 10, api, old_tweets)
+        if not detected_tweets == []:
+            for tweet in detected_tweets:
+                print("Username: " + tweet[1])
+                print("ID      : " + str(tweet[0]))
+                print("Text    :\n" + tweet[4])
+        print(count)
+        time.sleep(15)
+        count += 1
 if __name__ == '__main__':
     main()
+    #test()
