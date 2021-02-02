@@ -225,5 +225,5 @@ def test():
         time.sleep(15)
         count += 1
 if __name__ == '__main__':
-    #main()
-    test()
+    main()
+    #test()
