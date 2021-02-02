@@ -191,7 +191,7 @@ def main():
     count = 0
     while True:
         
-        detected_tweets, old_tweets = search('("Serene"%20"Linux")%20OR%20"SereneLinux"%20OR%20%20("Alter"%20"Linux")%20OR%20"AlterLinux"%20OR%20"Fascode"%20OR%20("Fascode"%20"Network")%20OR%20"FascodeNetwork"%20OR%20"AlterISO"%20OR%20("LUBS"%20%20lang%3Aja)%20OR%20("水瀬玲音"%20%20-"水瀬玲音%20おみくじ%20を引きました")%20OR%20("せれねあーと"%20OR%20"%23せれねあーと")%20%20-("おみくじ"%20OR%20"天気予報")%20exclude%3Aretweets%20-source%3Atwittbot.net', 10, api, old_tweets)
+        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net', 10, api, old_tweets)
         if not detected_tweets == []:
             for tweet in detected_tweets:
                 post_tweets(url, tweet)
