@@ -170,7 +170,7 @@ def readlog(path):
 # @allなどを``で囲んで無効化する
 def quotetweettext(text, replacelist):
     for reprule in replacelist:
-        text = text.replace(reprule, '`' + reprule + '`')
+        text = text.replace(reprule, "＠" + reprule[1:])
     return text
 # 総合処理
 def main():
