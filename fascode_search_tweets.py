@@ -215,7 +215,7 @@ def test():
     count = 0
     while True:
         
-        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR ("せれねあーと" OR "#せれねあーと") exclude:retweets -source:twittbot.net', 10, api, old_tweets)
+        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net', 10, api, old_tweets)
         if not detected_tweets == []:
             for tweet in detected_tweets:
                 print("Username: " + tweet[1])
