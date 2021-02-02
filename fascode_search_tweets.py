@@ -26,8 +26,8 @@ def search(searchwords, set_count, api, old_tweets):
         results = api.search(q=searchwords, count=set_count, tweet_mode="extended", result_type="recent")
     except tweepy.TweepError as e:
         with open('/var/log/search_tweets.err', mode='a')  as f:
-            f.write('\n' + "get error: " + e)
-            f.write('\n' + "reason: " + e.reason + '\n')
+            f.write('\n' + "get error: " + str(e))
+            f.write('\n' + "reason: " + str(e.reason) + '\n')
         if e.reason == "[{'message': 'Rate limit exceeded', 'code': 88}]":
                 # 15分待つのに，いつ処理が止まったか時間を表示。
                 print(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
