@@ -23,7 +23,7 @@ import os
 #引数: 検索ワード, 検索する件数, apiのインスタンス  機能: 検索結果を2次元リストで返す  リスト形式: [[ツイートID, ユーザ名, ツイートID, アイコン, ツイート本文], [ツイートID, …]]
 def search(searchwords, set_count, api, old_tweets):
     try:
-        results = api.search(q=searchwords, count=set_count, tweet_mode="extended")
+        results = api.search(q=searchwords, count=set_count, tweet_mode="extended", result_type="recent")
     except tweepy.TweepError as e:
         with open('/var/log/search_tweets.err', mode='a')  as f:
             f.write('\n' + "get error: " + e)
@@ -33,7 +33,6 @@ def search(searchwords, set_count, api, old_tweets):
                 print(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
                 time.sleep(60 * 15)
         return search(searchwords, set_count, api, old_tweets)
-            
     detected_tweets = []
     for result in results:
         status_n = result._json['id']
@@ -42,7 +41,7 @@ def search(searchwords, set_count, api, old_tweets):
             control_arraylength(old_tweets)
             return (detected_tweets, old_tweets)
 
-        text = result._json['full_text']
+        text = quotetweettext(result._json['full_text'], ["@all", "@channe", "@here"])
         username = result.user._json['screen_name']
         url = "https://twitter.com/" + username + "/status/" + str(status_n)
         icon = result.user._json['profile_image_url_https']
@@ -161,13 +160,18 @@ def readlog(path):
                 f.write('warning: ' + path + "is empty.\n")
                 return [0]
         else:
-            with open(path, mode='r') as f:                
+            with open(path, mode='r') as f:
                 return [int(x.strip()) for x in f.read().split(',')]
     else:
         with open('/var/log/search_tweets.err', mode='a')  as f:
                 f.write('warning: ' + path + "is not found.\n")
                 return [0]
 
+# @allなどを``で囲んで無効化する
+def quotetweettext(text, replacelist):
+    for reprule in replacelist:
+        text = text.replace(reprule, '`' + reprule + '`')
+    return text
 # 総合処理
 def main():
     old_tweets = readlog(r'/var/log/search_tweets.lasttweets')
@@ -187,7 +191,7 @@ def main():
     count = 0
     while True:
         
-        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 10, api, old_tweets)
+        detected_tweets, old_tweets = search('("Serene"%20"Linux")%20OR%20"SereneLinux"%20OR%20%20("Alter"%20"Linux")%20OR%20"AlterLinux"%20OR%20"Fascode"%20OR%20("Fascode"%20"Network")%20OR%20"FascodeNetwork"%20OR%20"AlterISO"%20OR%20("LUBS"%20%20lang%3Aja)%20OR%20("水瀬玲音"%20%20-"水瀬玲音%20おみくじ%20を引きました")%20OR%20("せれねあーと"%20OR%20"%23せれねあーと")%20%20-("おみくじ"%20OR%20"天気予報")%20exclude%3Aretweets%20-source%3Atwittbot.net', 10, api, old_tweets)
         if not detected_tweets == []:
             for tweet in detected_tweets:
                 post_tweets(url, tweet)
@@ -211,7 +215,7 @@ def test():
     count = 0
     while True:
         
-        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 10, api, old_tweets)
+        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS"  lang:ja) OR ("水瀬玲音"  -"水瀬玲音 おみくじ を引きました") OR ("せれねあーと" OR "#せれねあーと") -("おみくじ" OR "天気予報") exclude:retweets -source:twittbot.net', 10, api, old_tweets)
         if not detected_tweets == []:
             for tweet in detected_tweets:
                 print("Username: " + tweet[1])
@@ -221,5 +225,5 @@ def test():
         time.sleep(15)
         count += 1
 if __name__ == '__main__':
-    main()
-    #test()
+    #main()
+    test()
