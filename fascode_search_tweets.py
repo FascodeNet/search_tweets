@@ -3,7 +3,7 @@
 # Twitter: @yangniao23
 # Email  : yang@fascode.net
 #
-# (c) 2019-2020 Fascode Network.
+# (c) 2019-2021 Fascode Network.
 #
 # search_tweets.py
 #
@@ -20,8 +20,10 @@ import datetime
 import os
 
 
-#引数: 検索ワード, 検索する件数, apiのインスタンス  機能: 検索結果を2次元リストで返す  リスト形式: [[ツイートID, ユーザ名, ツイートID, アイコン, ツイート本文], [ツイートID, …]]
-def search(searchwords, set_count, api, old_tweets):
+# 引数: 検索ワード, 検索する件数, apiのインスタンス, 取得済みツイートのリスト, 検索除外するユーザ名
+# 機能: 検索結果を2次元リストで返す, 取得済みツイートのリストを返す  
+# リスト形式: [[ツイートID, ユーザ名, ツイートID, アイコン, ツイート本文], [ツイートID, …]]
+def search(searchwords, set_count, api, old_tweets, username_blacklist):
     try:
         results = api.search(q=searchwords, count=set_count, tweet_mode="extended", result_type="recent")
     except tweepy.TweepError as e:
@@ -32,11 +34,13 @@ def search(searchwords, set_count, api, old_tweets):
                 # 15分待つのに，いつ処理が止まったか時間を表示。
                 print(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
                 time.sleep(60 * 15)
-        return search(searchwords, set_count, api, old_tweets)
+        return search(searchwords, set_count, api, old_tweets, username_blacklist)
+
     detected_tweets = []
     for result in results:
         status_n = result._json['id']
         if status_n in old_tweets:
+            # extend() はリストの末尾にリストをくっつける
             old_tweets.extend([result._json['id'] for result in results])
             control_arraylength(old_tweets)
             return (detected_tweets, old_tweets)
@@ -45,6 +49,11 @@ def search(searchwords, set_count, api, old_tweets):
         username = result.user._json['screen_name']
         url = "https://twitter.com/" + username + "/status/" + str(status_n)
         icon = result.user._json['profile_image_url_https']
+
+        # Check
+        if username in username_blacklist:
+            continue
+
         detected_tweets.append([status_n, username, url, icon, text])
 
     old_tweets.extend([result._json['id'] for result in results])
@@ -161,7 +170,7 @@ def readlog(path):
                 return [0]
         else:
             with open(path, mode='r') as f:
-                return [int(x.strip()) for x in f.read().split(',')]
+                return [x.strip() for x in f.read().split(',')]
     else:
         with open('/var/log/search_tweets.err', mode='a')  as f:
                 f.write('warning: ' + path + "is not found.\n")
@@ -174,8 +183,9 @@ def quotetweettext(text, replacelist):
     return text
 # 総合処理
 def main():
-    old_tweets = readlog(r'/var/log/search_tweets.lasttweets')
+    old_tweets = [int(x) for x in readlog(r'/var/log/search_tweets.lasttweets')]
     old_tweets = control_arraylength(old_tweets)
+    username_blacklist = readlog(r'username_blacklist')
 
     consumer_key = setting.consumer_key
     consumer_secret = setting.consumer_secret
@@ -190,7 +200,13 @@ def main():
 
     count = 0
     while True:
-        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR  "Fasc○de" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net', 10, api, old_tweets)
+        detected_tweets, old_tweets = search(
+            '(("Serene" "Linux") OR "SereneLinux" OR ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR  "Fasc○de" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
+            OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net',
+            10,
+            api,
+            old_tweets,
+            username_blacklist)
         if not detected_tweets == []:
             for tweet in detected_tweets:
                 post_tweets(url, tweet)
@@ -199,7 +215,7 @@ def main():
         count += 1
 
 def test():
-    old_tweets = readlog(r'/var/log/search_tweets.lasttweets')
+    old_tweets = [int(x) for x in readlog(r'/var/log/search_tweets.lasttweets')]
     old_tweets = control_arraylength(old_tweets)
 
     consumer_key = setting.consumer_key
@@ -210,10 +226,16 @@ def test():
     auth.set_access_token(access_key, access_secret)
     api = tweepy.API(auth)
 
-
+    username_blacklist = readlog(r'username_blacklist')
     count = 0
     while True:
-        detected_tweets, old_tweets = search('(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fasc○de"  OR " Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO") OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net', 10, api, old_tweets)
+        detected_tweets, old_tweets = search(
+            '(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fasc○de"  OR " Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
+            OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net',
+            10,
+            api,
+            old_tweets,
+            username_blacklist)
         if not detected_tweets == []:
             for tweet in detected_tweets:
                 print("Username: " + tweet[1])
