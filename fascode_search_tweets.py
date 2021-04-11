@@ -21,7 +21,7 @@ import os
 
 
 # 引数: 検索ワード, 検索する件数, apiのインスタンス, 取得済みツイートのリスト, 検索除外するユーザ名
-# 機能: 検索結果を2次元リストで返す, 取得済みツイートのリストを返す  
+# 機能: 検索結果を2次元リストで返す, 取得済みツイートのリストを返す
 # リスト形式: [[ツイートID, ユーザ名, ツイートID, アイコン, ツイート本文], [ツイートID, …]]
 def search(searchwords, set_count, api, old_tweets, username_blacklist):
     try:
@@ -201,7 +201,7 @@ def main():
     count = 0
     while True:
         detected_tweets, old_tweets = search(
-            '(("Serene" "Linux") OR "SereneLinux" OR ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR  "Fasc○de" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
+            '(("Serene" "Linux") OR "SereneLinux" OR ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR  "Fasc○de" OR OR "Fascord" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
             OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net',
             10,
             api,
@@ -230,7 +230,7 @@ def test():
     count = 0
     while True:
         detected_tweets, old_tweets = search(
-            '(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fasc○de"  OR " Fascode" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
+            '(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fasc○de"  OR " Fascode" OR "Fascord" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
             OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net',
             10,
             api,
