@@ -201,7 +201,7 @@ def main():
     count = 0
     while True:
         detected_tweets, old_tweets = search(
-            '(("Serene" "Linux") OR "SereneLinux" OR ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR  "Fasc○de" OR OR "Fascord" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
+            '(("Serene" "Linux") OR "SereneLinux" OR ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR "Fasc○de" OR "Fascord" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
             OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net',
             10,
             api,
@@ -230,7 +230,7 @@ def test():
     count = 0
     while True:
         detected_tweets, old_tweets = search(
-            '(("Serene" "Linux") OR "SereneLinux" OR  ("Alter" "Linux") OR "AlterLinux" OR "Fasc○de"  OR " Fascode" OR "Fascord" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
+            '(("Serene" "Linux") OR "SereneLinux" OR ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR "Fasc○de" OR "Fascord" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
             OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net',
             10,
             api,
@@ -245,5 +245,5 @@ def test():
         time.sleep(15)
         count += 1
 if __name__ == '__main__':
-    main()
-    #test()
+    #main()
+    test()
