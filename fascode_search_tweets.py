@@ -92,7 +92,7 @@ def post_tweets_secret(url_secret, tweet):
                     {
                         "name": "🗩返信",
                         "integration": {
-                            "url": "https://fascode.net/api/mattermost/replytw.php?twurl=" + tweet[2],
+                            "url": "https://api.fascode.net/mattermost/replytw.php?twurl=" + tweet[2],
                             "context": {
                                 "action": "do_something_ephemeral"
                             },
@@ -100,7 +100,7 @@ def post_tweets_secret(url_secret, tweet):
                     }, {
                         "name": "🗘リツイート",
                         "integration": {
-                            "url": "https://fascode.net/api/mattermost/rttw.php?twurl=" + tweet[2],
+                            "url": "https://api.fascode.net/mattermost/rttw.php?twurl=" + tweet[2],
                             "context": {
                                 "action": "do_something_ephemeral"
                             },
@@ -108,7 +108,7 @@ def post_tweets_secret(url_secret, tweet):
                     }, {
                         "name": "♥いいね",
                         "integration": {
-                            "url": "https://fascode.net/api/twitter/iine.php?id=" + str(tweet[0]),
+                            "url": "https://api.fascode.net/twitter/iine.php?id=" + str(tweet[0]),
                             "context": {
                                 "action": "do_somethings_ephemeral"
                             },
@@ -202,7 +202,7 @@ def main():
     while True:
         detected_tweets, old_tweets = search(
             '(("Serene" "Linux") OR "SereneLinux" OR ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR "Fasc○de" OR "Fascord" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
-            OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net',
+            OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net -source:"Botbird tweets"',
             10,
             api,
             old_tweets,
@@ -231,7 +231,7 @@ def test():
     while True:
         detected_tweets, old_tweets = search(
             '(("Serene" "Linux") OR "SereneLinux" OR ("Alter" "Linux") OR "AlterLinux" OR "Fascode" OR "Fasc○de" OR "Fascord" OR ("Fascode" "Network") OR "FascodeNetwork" OR "AlterISO")\
-            OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net',
+            OR ("LUBS" lang:ja) OR ("水瀬玲音" -"おみくじ") OR "#せれねあーと" exclude:retweets -source:twittbot.net -source:"Botbird tweets"',
             10,
             api,
             old_tweets,
