@@ -25,9 +25,9 @@ import os
 # リスト形式: [[ツイートID, ユーザ名, ツイートID, アイコン, ツイート本文], [ツイートID, …]]
 def search(searchwords, set_count, api, old_tweets, username_blacklist):
     try:
-        results = api.search_tweets(q=searchwords, count=set_count,
-                                    tweet_mode="extended", result_type="recent")
-    except tweepy.errors.TweepyException as e:
+        results = api.search(q=searchwords, count=set_count,
+                             tweet_mode="extended", result_type="recent")
+    except tweepy.TweepError as e:
         with open('/var/log/search_tweets.err', mode='a') as f:
             f.write('\n' + "get error: " + str(e))
             f.write('\n' + "reason: " + str(e.reason) + '\n')
