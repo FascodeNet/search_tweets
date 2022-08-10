@@ -208,7 +208,8 @@ def main():
     old_tweets = [int(x)
                   for x in readlog(r'/var/log/search_tweets.lasttweets')]
     old_tweets = control_arraylength(old_tweets)
-    username_blacklist = readlog(r'username_blacklist')
+    username_blacklist = readlog(os.path.dirname(
+        os.path.abspath(__file__)) + r'/username_blacklist')
 
     consumer_key = setting.consumer_key
     consumer_secret = setting.consumer_secret
@@ -273,5 +274,5 @@ def test():
 
 
 if __name__ == '__main__':
-    # main()
-    test()
+    main()
+    # test()
