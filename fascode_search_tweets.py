@@ -251,7 +251,8 @@ def test():
     auth.set_access_token(access_key, access_secret)
     api = tweepy.API(auth)
 
-    username_blacklist = readlog(r'username_blacklist')
+    username_blacklist = readlog(os.path.dirname(
+        os.path.abspath(__file__)) + r'/username_blacklist')
     count = 0
     while True:
         detected_tweets, old_tweets = search(
